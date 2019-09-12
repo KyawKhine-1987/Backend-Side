@@ -17,15 +17,16 @@ $app = new \Slim\App([
 $app->add(new Tuupola\Middleware\HttpBasicAuthentication([
     "secure"=>false,
     "users" => [
-        "belalkhan" => "123456",
+        "brooklyn" => "123456",
     ]
 ]));
 
 /* 
-    endpoint: createuser
+    endpoint: createuser & userlogin
     parameters: email, password, name, school
     method: POST
 */
+/*+++++++Start+++++++*/
 $app->post('/createuser', function(Request $request, Response $response){
 
     if(!haveEmptyParameters(array('email', 'password', 'name', 'school'), $request, $response)){
@@ -115,7 +116,7 @@ $app->post('/userlogin', function(Request $request, Response $response){
             $response_data = array();
 
             $response_data['error']=true; 
-            $response_data['message'] = 'User not exist';
+            $response_data['message'] = 'User does not exist!';
 
             $response->write(json_encode($response_data));
 
@@ -127,7 +128,7 @@ $app->post('/userlogin', function(Request $request, Response $response){
             $response_data = array();
 
             $response_data['error']=true; 
-            $response_data['message'] = 'Invalid credential';
+            $response_data['message'] = 'Invalid credential!';
 
             $response->write(json_encode($response_data));
 
@@ -141,7 +142,14 @@ $app->post('/userlogin', function(Request $request, Response $response){
         ->withHeader('Content-type', 'application/json')
         ->withStatus(422);    
 });
+/*+++++++End+++++++*/
 
+/* 
+    endpoint: allusers & hello/{name} which is meant argument
+    parameters: email, password, name, school
+    method: GET
+*/
+/*+++++++Start+++++++*/
 $app->get('/allusers', function(Request $request, Response $response){
 
     $db = new DbOperations; 
@@ -161,7 +169,19 @@ $app->get('/allusers', function(Request $request, Response $response){
 
 });
 
+$app->get('/hello/{name}', function (Request $request, Response $response, array $args) {
+    $name = $args['name'];
+    $response->getBody()->write("Hello, $name");
+    return $response;
+});
+/*+++++++End+++++++*/
 
+/* 
+    endpoint: updateuser/{id} & updatepassword
+    parameters: email, password, name, school
+    method: PUT
+*/
+/*+++++++Start+++++++*/
 $app->put('/updateuser/{id}', function(Request $request, Response $response, array $args){
 
     $id = $args['id'];
@@ -255,7 +275,14 @@ $app->put('/updatepassword', function(Request $request, Response $response){
         ->withHeader('Content-type', 'application/json')
         ->withStatus(422);  
 });
+/*+++++++End+++++++*/
 
+/* 
+    endpoint: deleteuser/{id} & updatepassword
+    parameters: email, password, name, school
+    method: delete
+*/
+/*+++++++Start+++++++*/
 $app->delete('/deleteuser/{id}', function(Request $request, Response $response, array $args){
     $id = $args['id'];
 
@@ -277,6 +304,7 @@ $app->delete('/deleteuser/{id}', function(Request $request, Response $response, 
     ->withHeader('Content-type', 'application/json')
     ->withStatus(200);
 });
+/*+++++++End+++++++*/
 
 function haveEmptyParameters($required_params, $request, $response){
     $error = false; 
